@@ -5765,7 +5765,8 @@ def PrintShloka(ChapterNumber: str, VerseNumber: str):
 
 def PrintShlokaRandom():
     ChapterNumber = random.randint(1, GetChapterCount())
-    VerseNumber = random.randint(1, GetVersesInChapter(str(ChapterNumber)))
+    VerseIndex = random.randint(1, GetVersesInChapter(str(ChapterNumber)))
+    VerseNumber = GitaBook['chapters'][str(ChapterNumber)]['verse_numbers'][VerseIndex]
     PrintChapterDesc(str(ChapterNumber))
     print("\n")
     PrintShloka(str(ChapterNumber), str(VerseNumber))
