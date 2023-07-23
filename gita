@@ -5777,7 +5777,7 @@ class Gita():
 
         verse_parser = subparser.add_parser("verse", help="Prints the verse")
         verse_parser.add_argument("--chapter_number", type=int, help="The chapter number")
-        verse_parser.add_argument("--verse_number", type=int, help="The verse number")
+        verse_parser.add_argument("--verse_number", type=str, help="The verse number")
 
         verse_list_parser = subparser.add_parser("verses", help="Prints the verses")
         verse_list_parser.add_argument("--chapter_number", type=int, help="The chapter number")
