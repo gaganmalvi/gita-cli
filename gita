@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import argparse
 import random
 
 GitaBook = {
@@ -5743,32 +5744,86 @@ GitaBook = {
     }
 }
 
-# Return the number of chapters
-def GetChapterCount():
-    return len(GitaBook['chapters'])
+class Gita():
+    def __init__(self, **kwargs):
+        self.action()
 
-# Return the number of verses in a chapter
-def GetVersesInChapter(ChapterNumber: str):
-    return len(GitaBook['chapters'][ChapterNumber]['verse_numbers'])
+    def action(self):
+        args = self.argument_parser()
 
-# Return the chapter description
-def PrintChapterDesc(ChapterNumber: str):
-    print("Chapter " + str(ChapterNumber) + ": " + GitaBook['chapters'][ChapterNumber]['name'])
-    print(GitaBook['chapters'][ChapterNumber]['name_meaning'])
+        if args.command == "chapter":
+            self.PrintChapterDesc(str(args.chapter_number))
+        elif args.command == "verse":
+            self.PrintShloka(str(args.chapter_number), str(args.verse_number))
+        elif args.command == "verses":
+            self.PrintChapterDesc(str(args.chapter_number))
+            print("\nVerses:")
+            try:
+                for verse_number in GitaBook['chapters'][str(args.chapter_number)]['verse_numbers']:
+                    print(verse_number)
+            except KeyError:
+                print("Chapter not found")
+        elif args.command == "random":
+            self.PrintShlokaRandom()
 
-def PrintShloka(ChapterNumber: str, VerseNumber: str):
-    print("Verse " + str(VerseNumber) + ":")
-    print(GitaBook['verses'][ChapterNumber][VerseNumber]['text'])
-    print(GitaBook['verses'][ChapterNumber][VerseNumber]['transliteration'])
-    print(GitaBook['verses'][ChapterNumber][VerseNumber]['word_meanings'])
-    print(GitaBook['verses'][ChapterNumber][VerseNumber]['meaning'])
+    def argument_parser(self):
+        parser = argparse.ArgumentParser(prog="gita", description="Bhagavad Gita in the command line")
 
-def PrintShlokaRandom():
-    ChapterNumber = random.randint(1, GetChapterCount())
-    VerseIndex = random.randint(1, GetVersesInChapter(str(ChapterNumber)))
-    VerseNumber = GitaBook['chapters'][str(ChapterNumber)]['verse_numbers'][VerseIndex]
-    PrintChapterDesc(str(ChapterNumber))
-    print("\n")
-    PrintShloka(str(ChapterNumber), str(VerseNumber))
+        subparser = parser.add_subparsers(dest="command")
+        subparser.required = True
 
-PrintShlokaRandom()
+        chapter_parser = subparser.add_parser("chapter", help="Prints the chapter description")
+        chapter_parser.add_argument("chapter_number", type=int, help="The chapter number")
+
+        verse_parser = subparser.add_parser("verse", help="Prints the verse")
+        verse_parser.add_argument("--chapter_number", type=int, help="The chapter number")
+        verse_parser.add_argument("--verse_number", type=int, help="The verse number")
+
+        verse_list_parser = subparser.add_parser("verses", help="Prints the verses")
+        verse_list_parser.add_argument("--chapter_number", type=int, help="The chapter number")
+
+        random_parser = subparser.add_parser("random", help="Prints a random verse")
+
+        chapter_list_parser = subparser.add_parser("chapters", help="Prints the chapters")
+
+        return parser.parse_args()
+
+    # Return the number of chapters
+    def GetChapterCount(self):
+        return len(GitaBook['chapters'])
+    
+    # Return the number of verses in a chapter
+    def GetVersesInChapter(self, ChapterNumber: int):
+        try:
+            return len(GitaBook['chapters'][str(ChapterNumber)]['verse_numbers'])
+        except:
+            return "Not found"
+    
+    # Return the chapter description
+    def PrintChapterDesc(self, ChapterNumber: int):
+        try:
+            print("Chapter " + str(ChapterNumber) + ": " + GitaBook['chapters'][ChapterNumber]['name'])
+            print(GitaBook['chapters'][ChapterNumber]['name_meaning'])
+        except KeyError:
+            print("Chapter not found")
+    
+    def PrintShloka(self, ChapterNumber: int, VerseNumber: str):
+        try:
+            print("Verse " + str(VerseNumber) + ":")
+            print(GitaBook['verses'][ChapterNumber][VerseNumber]['text'])
+            print(GitaBook['verses'][ChapterNumber][VerseNumber]['transliteration'])
+            print(GitaBook['verses'][ChapterNumber][VerseNumber]['word_meanings'])
+            print(GitaBook['verses'][ChapterNumber][VerseNumber]['meaning'])    
+        except KeyError:
+            print("Verse not found")
+
+    def PrintShlokaRandom(self):
+        ChapterNumber = random.randint(1, self.GetChapterCount())
+        VerseIndex = random.randint(1, self.GetVersesInChapter(str(ChapterNumber)))
+        VerseNumber = GitaBook['chapters'][str(ChapterNumber)]['verse_numbers'][VerseIndex]
+        self.PrintChapterDesc(str(ChapterNumber))
+        print("\n")
+        self.PrintShloka(str(ChapterNumber), str(VerseNumber))
+
+if __name__ == "__main__":
+    client = Gita()
